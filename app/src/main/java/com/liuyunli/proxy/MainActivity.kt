@@ -452,12 +452,31 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                         }
                     }
 
+                    // 彩蛋：启动按钮与 GitHub 入口之间的自嘲文案 + 狗头 emoji
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "程序完全由牛马AI生成，那人一个代码都没敲！",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF6B7280),
+                            textAlign = TextAlign.Center
+                        )
+                        Image(
+                            painter = painterResource(R.drawable.emoji_dog),
+                            contentDescription = null,
+                            modifier = Modifier.padding(start = 4.dp).size(18.dp)
+                        )
+                    }
+
                     Icon(
                         painter = painterResource(R.drawable.ic_github),
                         contentDescription = "打开 GitHub 仓库",
                         tint = Color(0xFF6B7280),
                         modifier = Modifier
-                            .padding(top = 26.dp)
+                            .padding(top = 14.dp)
                             .size(34.dp)
                             .clickable {
                                 val ok = runCatching {
