@@ -8,9 +8,13 @@
 
 [![Release](https://img.shields.io/github/v/release/lookmm/ldl_http-socks5?display_name=tag)](https://github.com/lookmm/ldl_http-socks5/releases)
 [![Platform](https://img.shields.io/badge/Android-7.0%2B%20(arm64--v8a)-3ddc84)](https://github.com/lookmm/ldl_http-socks5/releases)
-[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![License](https://img.shields.io/badge/License-GPLv3-blue)](LICENSE)
 
-[下载安装](#下载安装) · [功能特性](#功能特性) · [从源码构建](#从源码构建) · [用户手册](USER_GUIDE.md) · [常见问题](USER_GUIDE.md#常见问题)
+[下载安装](#下载安装) · [功能特性](#功能特性) · [从源码构建](#从源码构建) · [用户手册](USER_GUIDE.md) · [致谢与引用](#致谢与开源引用) · [常见问题](USER_GUIDE.md#常见问题)
+
+**程序完全由牛马AI生成，那人一个代码都没敲！** <img src="docs/dog-emoji.png" width="20" alt="狗头">
+
+<sub>AI 生成内容标识：本项目代码与文档由 AI 助手辅助生成，经维护者审阅后发布；AI 输出不代表任何第三方立场。</sub>
 
 </div>
 
@@ -124,6 +128,36 @@ app/src/main/
 
 本项目仅供个人自建代理的客户端使用，请遵守所在国家 / 地区的法律法规与服务商条款。使用本软件产生的任何后果由使用者自行承担。
 
+## 致谢与开源引用
+
+这个项目站在很多开源工作之上。下面按依赖程度列出所用项目与参考对象，感谢作者与社区的无偿投入：
+
+| 项目 | 本项目中的用途 | 许可证 | 说明 |
+| --- | --- | --- | --- |
+| [SagerNet/sing-box](https://github.com/SagerNet/sing-box) | 代理内核：`libbox` 在 App 内本地运行，负责 TUN 入站、出站与分流 | GPL-3.0-or-later（附名称使用附加条款） | 运行时二进制依赖，上游 AAR 未随仓库分发 |
+| [SagerNet/sing-geosite](https://github.com/SagerNet/sing-geosite) | `geosite-cn`、`geosite-category-ads-all` 规则集来源 | GPL-3.0 | 规则数据，构建期转换为 `.srs` |
+| [SagerNet/sing-geoip](https://github.com/SagerNet/sing-geoip) | `geoip-cn` 规则集来源 | GPL-3.0 | 同上 |
+| [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo) | 分流规则的组织顺序与配置结构参考 | GPL-3.0 | 仅思路参考，未复制代码 |
+| [MetaCubeX/ClashMetaForAndroid](https://github.com/MetaCubeX/ClashMetaForAndroid) | 「减法」架构参考：内核与 UI 解耦、单页配置流 | GPL-3.0 | 仅架构与交互参考 |
+| [Karing](https://github.com/KaringX/karing) / SFA | 功能形态与交互细节参考 | GPL-3.0 + 附加条款 | 仅功能参考，未复用其代码 |
+| [AndroidX / Jetpack Compose / CameraX](https://developer.android.com/jetpack) | UI、状态管理与相机扫码 | Apache-2.0 | 见 `THIRD_PARTY_NOTICES.md` |
+| [zxing](https://github.com/zxing/zxing) | 二维码生成与识别 | Apache-2.0 | Android 客户端库 |
+| [Twemoji](https://github.com/jdecked/twemoji) | 首页狗头 emoji 图形（`docs/dog-emoji.png`、`res/drawable-xxxhdpi/emoji_dog.png`） | [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 图形版权归 Twitter/X，按 CC-BY 署名使用 |
+
+第三方组件的完整许可证文本与版权声明见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
+
+## 许可证合规说明
+
+- **整体许可为 GPL-3.0**。本项目发布的 APK 打包了 sing-box 的 `libbox`（GPL-3.0-or-later）。按 GPL 的传染性要求，分发包含该库的作品时，整个作品必须以 GPL-3.0 兼容条款分发，并向接收者提供完整对应源码。本仓库即该源码（不含任何节点凭据），构建步骤见上文「从源码构建」。自 `v0.5.11` 起，本项目整体以 GPL-3.0 授权；此前发布的历史版本按其发布时的 MIT 条款继续有效。
+- **源码提供义务已满足**：`app/` 下为全部自研源码，`LICENSE` 为 GPL-3.0 全文；未做任何混淆或闭源封装。唯一不在仓库内的是上游 `libbox-arm64.aar` 预编译产物，可从 [SagerNet/sing-box Releases](https://github.com/SagerNet/sing-box/releases) 获取同版本构建。
+- **版权声明保留**：sing-box 及其规则集版权归原作者（nekohasekai / SagerNet），未做删除或修改；本项目自研部分版权归 lookmm。
+- **名称与关联**：sing-box 的附加条款要求「未经事先同意，衍生作品不得使用其名称或暗示关联」。本项目名称为 **老戴理 / MarvisProxy**，与 SagerNet、MetaCubeX 无隶属、赞助或背书关系；文档中提及 sing-box 仅为事实性依赖说明与致谢，不构成对其名称的商标性使用。
+- **未纳入附加条款代码**：Karing、SFA 等带「GPL-3.0 + 原名禁用」附加条款的项目仅作功能与交互参考，未复制其源码，因此本项目不构成其衍生作品，不受其附加条款约束。
+- **Apache-2.0 组件**：AndroidX、CameraX、zxing 等按其要求保留版权与许可声明，详见 `THIRD_PARTY_NOTICES.md`。
+- **规则集数据**：内置 `geosite-cn` / `geoip-cn` / ads 规则集源自 GPL-3.0 仓库，随本项目以 GPL-3.0 一并分发。
+
 ## License
 
-[MIT](LICENSE) © lookmm
+[GPL-3.0](LICENSE) © 2026 lookmm
+
+本项目为自由软件：你可以依据自由软件基金会发布的 GNU 通用公共许可证第三版（或更新版本）条款重新分发和/或修改它。本程序按「现状」提供，不附带任何担保。详见 [LICENSE](LICENSE)。
