@@ -1,0 +1,19 @@
+# Android / Gradle
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# 本地上游内核二进制（不含源码，自行放置）
+app/libs/*.aar
+
+# 备份与临时文件
+*.bak
+*.bak.*
+*.log
+*.tgz
+patch_*.tgz
