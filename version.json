@@ -1,0 +1,10 @@
+{
+  "versionCode": 15,
+  "versionName": "0.5.11",
+  "url": "https://github.com/lookmm/ldl_http-socks5/releases/download/v0.5.11/MarvisProxy-0.5.11-debug.apk",
+  "md5": "e8887d227309f1fbb42ecd58f208a518",
+  "size": 28738582,
+  "notes": "0.5.11 更新内容\n- 修复：恶意域名清单改为内联 domain_suffix 规则，解决内核启动 parse rule-set 报错（首页红字已消失）\n- 更新检查：复用规则集多镜像与通道回退（jsdelivr / raw / 两个反代），20s 预算内自动择优\n- 下载安装：Release 附件走反代镜像下载，MD5 校验通过后调起系统安装\n- 分发脱敏：APK 与代码不含任何节点地址、账号或密码，首启由用户自行填写",
+  "minSdk": 26,
+  "publishedAt": "2026-11-20T13:39:59Z"
+}
