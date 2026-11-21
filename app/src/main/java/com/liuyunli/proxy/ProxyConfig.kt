@@ -195,7 +195,10 @@ object ProxyConfig {
                 if (ignoreDomains.isNotEmpty()) {
                     put(JSONObject().apply {
                         put("domain_suffix", JSONArray().apply {
-                            ignoreDomains.forEach { put(it) }
+                            // *.a.com -> .a.com（仅子域）；a.com 保持匹配自身及子域
+                            ignoreDomains.forEach { d ->
+                                put(if (d.startsWith("*.")) "." + d.removePrefix("*.") else d)
+                            }
                         })
                         put("outbound", "direct")
                     })
