@@ -12,8 +12,8 @@ android {
         applicationId = "com.liuyunli.proxy"
         minSdk = 24
         targetSdk = 34
-        versionCode = 15
-        versionName = "0.5.11"
+        versionCode = 16
+        versionName = "0.5.12"
         ndk {
             abiFilters += listOf("arm64-v8a")
         }
