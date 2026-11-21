@@ -1,10 +1,10 @@
 {
-  "versionCode": 18,
-  "versionName": "0.5.14",
-  "url": "https://github.com/lookmm/ldl_http-socks5/releases/download/v0.5.14/LDLProxy-0.5.14-debug.apk",
-  "md5": "7a65a4f31fb883942bcfe10f5313881d",
-  "size": 28755745,
-  "notes": "0.5.14 更新内容\n- 工程代号统一为 LDLProxy，日志 TAG、VPN 会话名与请求 User-Agent 去除旧代号\n- 发布附件更名为 LDLProxy-x.y.z-debug.apk，下载地址同步更新\n- 忽略列表存储命名空间更换，升级后需重设自定义忽略网段/域名\n- 首页示例图更新为新版已连接界面\n",
+  "versionCode": 19,
+  "versionName": "0.5.15",
+  "url": "https://github.com/lookmm/ldl_http-socks5/releases/download/v0.5.15/LDLProxy-0.5.15-debug.apk",
+  "md5": "5cd0384a44d27892f1d05fe37895cb85",
+  "size": 28756141,
+  "notes": "0.5.15 更新内容\n- 顶部提示改为 8 秒自动消退，不再在连接/节点/规则三页常驻\n- 规则集四项更新完成后，立即清除「需先下载域名库」的残留提示\n",
   "minSdk": 26,
-  "publishedAt": "2026-11-21T04:15:00Z"
+  "publishedAt": "2026-11-21T04:35:00Z"
 }
