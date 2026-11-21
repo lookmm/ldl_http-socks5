@@ -4,7 +4,7 @@
 
 # 老戴理 · LDLProxy
 
-**一个极简的 Android 全局代理客户端：VpnService + sing-box 内核，单节点 HTTP / SOCKS5 出站，国内直连、其余走代理。**
+**一个极简的 Android 全局代理客户端：VpnService + sing-box 内核，单节点 HTTP / SOCKS5 出站，无需 Root，国内直连、其余走代理，内置广告与恶意域名拦截。**
 
 [![Release](https://img.shields.io/github/v/release/lookmm/ldl_http-socks5?display_name=tag)](https://github.com/lookmm/ldl_http-socks5/releases)
 [![Platform](https://img.shields.io/badge/Android-7.0%2B%20(arm64--v8a)-3ddc84)](https://github.com/lookmm/ldl_http-socks5/releases)
@@ -12,7 +12,11 @@
 
 [下载安装](#下载安装) · [功能特性](#功能特性) · [从源码构建](#从源码构建) · [用户手册](USER_GUIDE.md) · [更新日志](#更新日志) · [致谢与引用](#致谢与开源引用) · [常见问题](USER_GUIDE.md#常见问题)
 
+<sub>关键词：Android 代理客户端 · HTTP 代理 · SOCKS5 · VpnService · sing-box · 无需 Root · 分流 · split tunneling · 广告拦截</sub>
+
 **程序完全由牛马AI生成，那人一个代码都没敲！** <img src="docs/dog-emoji.png" width="20" alt="狗头">
+
+<sub>Minimal Android HTTP / SOCKS5 proxy client — VpnService + sing-box, split tunneling, no root required.</sub>
 
 <sub>AI 生成内容标识：本项目代码与文档由 AI 助手辅助生成，经维护者审阅后发布；AI 输出不代表任何第三方立场。</sub>
 
@@ -22,7 +26,7 @@
 
 ## 这是什么
 
-把一台自建的家宽 / 云主机上的 HTTP 或 SOCKS5 代理，变成手机上的「一键全局代理」：
+把一台自建的家宽 / 云主机上的 HTTP 或 SOCKS5 代理，变成 Android 手机上的「一键全局代理」——装 APK、填节点、点启动，全程不需要 Root：
 
 - **不用 root、不用写配置**：填地址端口账号密码，点「启动」即可接管全机流量（VpnService + TUN）。
 - **国内直连不绕路**：内置 `geosite-cn` / `geoip-cn` 规则集，国内域名与国内 IP 直连，只有境外流量才走你的节点。4G 出门刷国内 App 完全不经中继。
