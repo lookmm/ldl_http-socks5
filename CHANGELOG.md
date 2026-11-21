@@ -1,0 +1,34 @@
+# 更新日志
+
+本项目版本号与更新通道元数据以仓库根目录 `version.json` 为准，APK 附件见 [Releases](https://github.com/lookmm/ldl_http-socks5/releases)。
+
+## v0.5.12 — 2026-11-21
+
+### 新增 / 修复
+
+| 项 | 说明 |
+| --- | --- |
+| 忽略网段支持单个 IP | 填 `192.168.1.5` 自动补 `/32`，不再要求手写掩码；非法掩码与越界 IP 仍会被拒绝 |
+| 忽略域名支持通配符 | `*.example.com` 生成 `.example.com` 规则，只匹配子域；`example.com` 匹配该域及其全部子域 |
+| 内置 localhost 直连 | `localhost` 与 `*.localhost` 可直接加入忽略域名，本地开发服务不被代理拦截 |
+
+### 界面优化
+
+| 项 | 说明 |
+| --- | --- |
+| 节点信息兜底 | 节点名为空时以 `user***@host:port` 或 `host:port` 展示，避免出现「当前节点：（HTTP）」空括号 |
+| 错误提示卡片化 | 连接失败提示由长段红字改为圆角卡片：顶部「连接失败」标题 + 折叠正文，超过 40 字可点「详情」展开 |
+| 输入提示同步 | 规则页网段提示改为「IP 或网段」，域名提示补充 `*.example.com`、`localhost` 示例 |
+
+### 升级方式
+
+- 已安装旧版本：App 内点「检查更新」，或在设置里下载后直接安装（自动升级通道已内置，无需 adb）
+- 首次安装：前往 Releases 下载 `MarvisProxy-0.5.12-debug.apk`
+- 配置兼容：忽略列表与节点配置仍在原 prefs 中，升级不丢失
+
+## v0.5.11 — 2026-11-20
+
+- 恶意 / 钓鱼域名清单改为内联 `domain_suffix` 数组，摆脱 `rule_set source` 格式限制，对脏行容错
+- 自该版本起整体以 GPL-3.0 授权，补齐 `LICENSE`、`THIRD_PARTY_NOTICES.md`、`USER_GUIDE.md`
+
+更早版本请见 [Releases](https://github.com/lookmm/ldl_http-socks5/releases)。
