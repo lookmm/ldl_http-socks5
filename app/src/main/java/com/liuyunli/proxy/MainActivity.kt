@@ -64,6 +64,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -386,7 +393,7 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                     }
 
                     Text(
-                        text = if (node.isConfigured()) "当前节点：" + node.name + "（" + node.typeLabel() + "）"
+                        text = if (node.isConfigured()) "当前节点：" + node.name.ifBlank { node.masked() } + "（" + node.typeLabel() + "）"
                         else "未配置节点，请到「节点」页填写",
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
@@ -394,13 +401,52 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                     )
 
                     if (!running && error != null) {
-                        Text(
-                            text = error ?: "",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 12.dp)
-                        )
+                        var errExpanded by remember { mutableStateOf(false) }
+                        val msg = error ?: ""
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+                                .background(MaterialTheme.colorScheme.errorContainer, RoundedCornerShape(12.dp))
+                                .clickable { errExpanded = !errExpanded }
+                                .padding(horizontal = 12.dp, vertical = 10.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier.size(16.dp)
+                                        .background(MaterialTheme.colorScheme.error, CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "!",
+                                        color = MaterialTheme.colorScheme.onError,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(6.dp))
+                                Text(
+                                    text = "连接失败",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                if (msg.length > 40) {
+                                    Text(
+                                        text = if (errExpanded) "收起" else "详情",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                }
+                            }
+                            Text(
+                                text = msg.ifBlank { "未知原因，请检查节点配置后重试" },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                maxLines = if (errExpanded) 12 else 2,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(top = 4.dp, start = 2.dp)
+                            )
+                        }
                     }
 
                     Button(
@@ -905,14 +951,14 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                     OutlinedTextField(
                         value = input,
                         onValueChange = { input = it },
-                        label = { Text("新增网段，如 192.168.1.0/24") },
+                        label = { Text("新增 IP 或网段，如 10.0.0.5 或 192.168.1.0/24") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     )
                     Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
                         Button(onClick = {
                             if (input.isBlank()) {
-                                hint = "请输入网段"
+                                hint = "请输入 IP 或网段"
                                 return@Button
                             }
                             val adding = input.trim()
@@ -944,7 +990,7 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                         modifier = Modifier.padding(top = 16.dp)
                     )
                     Text(
-                        text = "填 example.com 即该域名及其全部子域直连；改动后重启连接生效",
+                        text = "填 example.com 即该域名及其全部子域直连；填 *.example.com 只匹配子域；localhost 也支持。改动后重启连接生效",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -978,7 +1024,7 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                     OutlinedTextField(
                         value = domainInput,
                         onValueChange = { domainInput = it },
-                        label = { Text("新增域名，如 example.com") },
+                        label = { Text("新增域名，如 example.com 或 *.example.com 或 localhost") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     )
