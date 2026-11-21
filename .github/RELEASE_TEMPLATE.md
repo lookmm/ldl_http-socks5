@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 4e74fcbc69ada4fed1513bceebbb4fef_e396a7b0e58611f19db6525400638852
-    ReservedCode1: 4b6iGmVO91dliiAH2TrVilHlXG/f0IQElHu8+71ibkqiIMoEsqQkzjsVDWt90xqG0IN7LVehBTaLA01swSiWrPpEA7oF6iaHqC9DPKl/EHCIgOrZz3xobwZ8RotJbQc5ho+tuEiYEaEl/1IYx2gpth+U4hvqpXdHmulZ70TZbn9OJ/S+h2WvvNZb2Kg=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 4e74fcbc69ada4fed1513bceebbb4fef_e396a7b0e58611f19db6525400638852
-    ReservedCode2: 4b6iGmVO91dliiAH2TrVilHlXG/f0IQElHu8+71ibkqiIMoEsqQkzjsVDWt90xqG0IN7LVehBTaLA01swSiWrPpEA7oF6iaHqC9DPKl/EHCIgOrZz3xobwZ8RotJbQc5ho+tuEiYEaEl/1IYx2gpth+U4hvqpXdHmulZ70TZbn9OJ/S+h2WvvNZb2Kg=
----
-
 # vX.Y.Z（YYYY-MM-DD）
 
 > 一句话概述本版本：<用一句话说明这个版本解决了谁的什么问题>
