@@ -54,13 +54,13 @@ object IgnoreList {
         save(context, DEFAULTS)
     }
 
-    /** 只接受 a.b.c.d/n 形式，容忍空格与多余斜杠 */
+    /** 接受 a.b.c.d/n 或裸 IP（自动补 /32），容忍空格 */
     private fun normalize(input: String): String? {
         val text = input.trim().replace(" ", "")
         val parts = text.split("/")
-        if (parts.size != 2) return null
+        if (parts.size > 2) return null
         val ip = parts[0]
-        val prefix = parts[1].toIntOrNull() ?: return null
+        val prefix = if (parts.size == 2) (parts[1].toIntOrNull() ?: return null) else 32
         if (prefix !in 0..32) return null
         val octets = ip.split(".")
         if (octets.size != 4) return null
@@ -102,17 +102,17 @@ object IgnoreList {
         saveDomains(context, emptyList())
     }
 
-    /** 接受 example.com / .example.com / *.example.com / https://a.b.com/path，统一为 example.com */
+    /** 接受 example.com / .example.com / *.example.com / localhost / https://a.b.com/path；通配保留为 *.example.com */
     fun normalizeDomain(input: String): String? {
         var t = input.trim().lowercase()
         t = t.removePrefix("http://").removePrefix("https://")
         t = t.substringBefore('/').substringBefore(':')
-        while (t.startsWith("*.") || t.startsWith(".")) {
-            t = if (t.startsWith("*.")) t.removePrefix("*.") else t.removePrefix(".")
-        }
+        if (t == "localhost") return "localhost"
+        val wildcard = t.startsWith("*.")
+        t = t.removePrefix("*.").removePrefix(".")
         if (t.isEmpty() || !t.contains('.')) return null
         if (t.contains("..")) return null
         if (!Regex("^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$").matches(t)) return null
-        return t
+        return if (wildcard) "*.$t" else t
     }
 }
