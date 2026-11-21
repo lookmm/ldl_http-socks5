@@ -10,7 +10,7 @@
 [![Platform](https://img.shields.io/badge/Android-7.0%2B%20(arm64--v8a)-3ddc84)](https://github.com/lookmm/ldl_http-socks5/releases)
 [![License](https://img.shields.io/badge/License-GPLv3-blue)](LICENSE)
 
-[下载安装](#下载安装) · [功能特性](#功能特性) · [从源码构建](#从源码构建) · [用户手册](USER_GUIDE.md) · [致谢与引用](#致谢与开源引用) · [常见问题](USER_GUIDE.md#常见问题)
+[下载安装](#下载安装) · [功能特性](#功能特性) · [从源码构建](#从源码构建) · [用户手册](USER_GUIDE.md) · [更新日志](#更新日志) · [致谢与引用](#致谢与开源引用) · [常见问题](USER_GUIDE.md#常见问题)
 
 **程序完全由牛马AI生成，那人一个代码都没敲！** <img src="docs/dog-emoji.png" width="20" alt="狗头">
 
@@ -60,7 +60,7 @@ App 内置更新检查：启动后自动比对仓库 `version.json`，有新版�
 | 协议 | HTTP、HTTPS（TLS 包装）、SOCKS5（可选用户名密码） |
 | 分流 | 本地网段 → 私有地址 → 广告拦截 → 恶意软件拦截 → 国内直连（geosite-cn / geoip-cn）→ 其余走代理 |
 | DNS | 国内域名走本地 UDP DNS，境外域名走 DoH（detour 代理），避免污染 |
-| 忽略列表 | 自定义直连网段（CIDR）与直连域名，默认含通用私有地址段 |
+| 忽略列表 | 自定义直连网段（CIDR 或单个 IP）与直连域名（支持 `*.example.com` 通配、内置 `localhost`），默认含通用私有地址段 |
 | 广告拦截 | 内置 `geosite-category-ads-all` 规则集，命中直接拒绝 |
 | 恶意拦截 | 支持在线更新恶意 / 钓鱼域名清单，命中直接拒绝 |
 | 规则集更新 | 一键更新 4 项（geosite / geoip / ads / malware），多镜像按序回退，支持取消；可自定义更新源 |
@@ -123,6 +123,24 @@ app/src/main/
 - 权限共 6 类：VPN 服务、前台服务（special use）、通知、相机（仅扫码）、网络状态、开机自启；无网络上报、无第三方统计 SDK。
 - 导出的 `LYVPN1:` 串与二维码**含明文密码**，仅在本机屏幕与剪贴板流转，请勿外发。
 - 日志只打印 `type://host:port` 级短标识，不含凭据。
+
+## 更新日志
+
+### v0.5.12（2026-11-21）
+
+- **忽略网段支持单个 IP**：填 `192.168.1.5` 自动按 `/32` 处理，不必再手写掩码
+- **忽略域名支持通配符**：`*.example.com` 只匹配其子域（不含主域本身）；填 `example.com` 则为该域及其全部子域
+- **内置 `localhost` 直连**：本地开发与调试服务不再被代理接管
+- 连接页节点名为空时以 `host:port` 兜底展示，不再显示空括号
+- 连接页错误提示改为卡片式（「连接失败」+ 详情展开），替代原先的长段红字
+- 规则页 / 节点页输入提示同步更新为「IP 或网段」「`*.example.com`」「`localhost`」
+
+### v0.5.11
+
+- 恶意域名清单改为内联 `domain_suffix` 数组，不再依赖 `rule_set source` 格式，对脏行容错
+- 自该版本起整体以 GPL-3.0 授权，补齐 `LICENSE`、`THIRD_PARTY_NOTICES.md` 与用户手册
+
+更早版本见 [Releases](https://github.com/lookmm/ldl_http-socks5/releases)。
 
 ## 免责声明
 
