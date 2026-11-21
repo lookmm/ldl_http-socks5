@@ -45,12 +45,12 @@ App 内置更新检查：启动后自动比对仓库 `version.json`，有新版�
 
 <div align="center">
 
-<img src="docs/screenshot-idle.png" width="260" alt="未连接">
 <img src="docs/screenshot-connected.png" width="260" alt="已连接">
+<img src="docs/screenshot-rules.png" width="260" alt="规则与忽略网段">
 
 </div>
 
-首页一屏到底：状态、连接时长、实时上下行 / 累计流量、当前节点、分流顺序与两个开关。
+首页一屏到底：状态、连接时长、实时上下行 / 累计流量、当前节点、分流顺序与两个开关；规则页管理分流开关、规则集更新与本地忽略网段 / 域名。
 
 ## 功能特性
 
