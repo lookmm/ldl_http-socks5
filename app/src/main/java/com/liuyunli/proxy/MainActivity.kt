@@ -32,6 +32,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -206,9 +207,19 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
     var newVersion by remember { mutableStateOf<UpdateChecker.Info?>(null) }
     var updateBusy by remember { mutableStateOf(false) }
     var updateStatus by remember { mutableStateOf<String?>(null) }
+    var dlDone by remember { mutableStateOf(0L) }
+    var dlTotal by remember { mutableStateOf(-1L) }
+    var dlStart by remember { mutableStateOf(0L) }
 
     var autoConnect by remember { mutableStateOf(RulePrefs.autoConnect(context)) }
     var hint by remember { mutableStateOf<String?>(initialHint) }
+
+    // 顶部提示只做短暂反馈：8 秒后自动消退，避免切到别的页面仍一直挂着
+    LaunchedEffect(hint) {
+        val h = hint ?: return@LaunchedEffect
+        delay(8000)
+        if (hint == h) hint = null
+    }
 
     // 启动静默查一次新版本（失败静默，不打扰）
     LaunchedEffect(Unit) {
@@ -465,9 +476,19 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                                     if (nv != null && !updateBusy) {
                                         updateBusy = true
                                         updateStatus = "正在下载 " + nv.label() + " …"
+                                        dlDone = 0L
+                                        dlTotal = if (nv.size > 0) nv.size else -1L
+                                        dlStart = System.currentTimeMillis()
                                         scope.launch {
                                             val r = runCatching {
-                                                withContext(Dispatchers.IO) { UpdateChecker.download(context, nv) }
+                                                withContext(Dispatchers.IO) {
+                                                    UpdateChecker.download(context, nv) { d, t ->
+                                                        scope.launch {
+                                                            dlDone = d
+                                                            if (t > 0) dlTotal = t
+                                                        }
+                                                    }
+                                                }
                                             }
                                             updateBusy = false
                                             r.onSuccess { f ->
@@ -493,6 +514,31 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.padding(top = 4.dp)
                                     )
+                                }
+                                if (updateBusy) {
+                                    val frac = if (dlTotal > 0) (dlDone.toFloat() / dlTotal).coerceIn(0f, 1f) else 0f
+                                    LinearProgressIndicator(
+                                        progress = { frac },
+                                        modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
+                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        val secs = ((System.currentTimeMillis() - dlStart) / 1000).coerceAtLeast(1)
+                                        val speed = dlDone / 1024 / secs
+                                        Text(
+                                            text = if (dlTotal > 0)
+                                                "${dlDone / 1024 / 1024.0f} / ${dlTotal / 1024 / 1024.0f} MB · ${(frac * 100).toInt()}% · ${speed}KB/s"
+                                            else "${dlDone / 1024} KB · ${speed}KB/s",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        TextButton(onClick = {
+                                            UpdateChecker.cancelDownload()
+                                            updateStatus = "正在取消…"
+                                        }) { Text("取消") }
+                                    }
                                 }
                             }
                         }
@@ -837,6 +883,8 @@ private fun App(onToggle: () -> Unit, onReload: () -> Unit, initialHint: String?
                                                         else -> "更新完成，4 项全部成功"
                                                     }
                                                     ruleSetInfo = RuleSetUpdater.summary(context)
+                                                    // 域名库已下载完成，"需先下载域名库"的旧提示立即清掉
+                                                    if (ok > 0 && hint?.contains("需先点下面") == true) hint = null
                                                     if (ProxyVpnService.running && ok > 0) onReload()
                                                 }
                                             }.start()
@@ -1092,6 +1140,8 @@ private fun UpdateSection() {
     var downloading by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf<String?>(null) }
     var info by remember { mutableStateOf<UpdateChecker.Info?>(null) }
+    var dlDone by remember { mutableStateOf(0L) }
+    var dlTotal by remember { mutableStateOf(-1L) }
 
     Card(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
@@ -1128,12 +1178,27 @@ private fun UpdateSection() {
                 val i = info
                 if (i != null) {
                     Button(
-                        enabled = !downloading && !checking,
+                        enabled = !checking,
                         onClick = {
+                            if (downloading) {
+                                UpdateChecker.cancelDownload()
+                                status = "正在取消…"
+                            } else {
                             downloading = true
                             status = "正在下载 " + i.label() + " …"
+                            dlDone = 0L
+                            dlTotal = if (i.size > 0) i.size else -1L
                             scope.launch {
-                                val r = runCatching { withContext(Dispatchers.IO) { UpdateChecker.download(context, i) } }
+                                val r = runCatching {
+                                    withContext(Dispatchers.IO) {
+                                        UpdateChecker.download(context, i) { d, t ->
+                                            scope.launch {
+                                                dlDone = d
+                                                if (t > 0) dlTotal = t
+                                            }
+                                        }
+                                    }
+                                }
                                 downloading = false
                                 r.onSuccess { f ->
                                     status = "下载完成（" + f.length() / 1024 / 1024 + "MB），正在调起安装"
@@ -1141,12 +1206,27 @@ private fun UpdateSection() {
                                         .onFailure { status = "无法调起安装：" + (it.message ?: "") }
                                 }.onFailure { status = "下载失败：" + (it.message ?: "网络不可用") }
                             }
+                            }
                         },
                         modifier = Modifier.padding(start = 8.dp)
                     ) {
-                        Text(if (downloading) "下载中…" else "下载并安装")
+                        Text(if (downloading) "取消下载" else "下载并安装")
                     }
                 }
+            }
+            if (downloading) {
+                val frac = if (dlTotal > 0) (dlDone.toFloat() / dlTotal).coerceIn(0f, 1f) else 0f
+                LinearProgressIndicator(
+                    progress = { frac },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
+                Text(
+                    text = if (dlTotal > 0)
+                        "${dlDone / 1024 / 1024.0f} / ${dlTotal / 1024 / 1024.0f} MB · ${(frac * 100).toInt()}%"
+                    else "${dlDone / 1024} KB",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
             status?.let {
                 Text(
