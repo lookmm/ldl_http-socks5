@@ -9,7 +9,7 @@ import android.util.Log
  * 改用 TrafficStats 按本应用 uid 的 socket 字节数做差值统计。
  */
 object TrafficMeter {
-    private const val TAG = "MarvisProxy"
+    private const val TAG = "LDLProxy"
     private const val UNSUPPORTED = -1L
     private const val RATE_MIN_INTERVAL_MS = 300L
 

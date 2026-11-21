@@ -363,7 +363,7 @@ object RuleSetUpdater {
             connectTimeout = CONNECT_TIMEOUT * 1000
             readTimeout = READ_TIMEOUT * 1000
             instanceFollowRedirects = true
-            setRequestProperty("User-Agent", "MarvisProxy/1.0")
+            setRequestProperty("User-Agent", "LDLProxy/1.0")
             setRequestProperty("Accept-Encoding", "identity")
         }
 

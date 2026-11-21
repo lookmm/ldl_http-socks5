@@ -8,7 +8,7 @@ import android.content.Context
  */
 object IgnoreList {
 
-    private const val PREF = "marvis_proxy"
+    private const val PREF = "ldl_proxy"
     private const val KEY = "ignore_cidrs"
 
     /** 默认忽略：两个爱快内网段（192.168.58.0/24、8.8.6.0/24）+ 通用私有段 */

@@ -1,10 +1,10 @@
 {
-  "versionCode": 17,
-  "versionName": "0.5.13",
-  "url": "https://github.com/lookmm/ldl_http-socks5/releases/download/v0.5.13/MarvisProxy-0.5.13-debug.apk",
-  "md5": "402c999e8c2e0efc86c4bfd484639df7",
-  "size": 28755761,
-  "notes": "0.5.13 更新内容\n- 下载进度可视化：显示 已下载/总大小、百分比与实时速度，不再出现「点了没反应」的假死观感\n- 下载可取消：点「取消」立即断开连接并终止，无需再强杀进程\n- 卡死自愈：单个源 15 秒无新增字节即判停滞并自动换下一个源，单源最长 5 分钟\n- 完整性校验：下载后按 version.json 的 size 与 md5 双重校验，坏包不会误装\n- 镜像顺序调整：国内反代（ghfast / gh-proxy）优先，GitHub 直链最后兜底\n",
+  "versionCode": 18,
+  "versionName": "0.5.14",
+  "url": "https://github.com/lookmm/ldl_http-socks5/releases/download/v0.5.14/LDLProxy-0.5.14-debug.apk",
+  "md5": "7a65a4f31fb883942bcfe10f5313881d",
+  "size": 28755745,
+  "notes": "0.5.14 更新内容\n- 工程代号统一为 LDLProxy，日志 TAG、VPN 会话名与请求 User-Agent 去除旧代号\n- 发布附件更名为 LDLProxy-x.y.z-debug.apk，下载地址同步更新\n- 忽略列表存储命名空间更换，升级后需重设自定义忽略网段/域名\n- 首页示例图更新为新版已连接界面\n",
   "minSdk": 26,
-  "publishedAt": "2026-11-21T03:36:26Z"
+  "publishedAt": "2026-11-21T04:15:00Z"
 }

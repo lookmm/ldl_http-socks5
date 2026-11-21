@@ -17,14 +17,14 @@ class BootReceiver : BroadcastReceiver() {
         if (!RulePrefs.autoConnect(context)) return
         if (ProxyVpnService.running) return
         if (VpnService.prepare(context) != null) {
-            Log.i("MarvisProxy", "开机自启跳过：VPN 授权已失效")
+            Log.i("LDLProxy", "开机自启跳过：VPN 授权已失效")
             return
         }
         runCatching {
             val it = Intent(context, ProxyVpnService::class.java)
                 .setAction(ProxyVpnService.ACTION_START)
             ContextCompat.startForegroundService(context, it)
-            Log.i("MarvisProxy", "开机自启：已拉起代理服务")
-        }.onFailure { Log.e("MarvisProxy", "开机自启失败", it) }
+            Log.i("LDLProxy", "开机自启：已拉起代理服务")
+        }.onFailure { Log.e("LDLProxy", "开机自启失败", it) }
     }
 }

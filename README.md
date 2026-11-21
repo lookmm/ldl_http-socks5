@@ -2,7 +2,7 @@
 
 <img src="docs/tiger.png" width="120" alt="老戴理">
 
-# 老戴理 · MarvisProxy
+# 老戴理 · LDLProxy
 
 **一个极简的 Android 全局代理客户端：VpnService + sing-box 内核，单节点 HTTP / SOCKS5 出站，国内直连、其余走代理。**
 
@@ -33,7 +33,7 @@
 
 ## 下载安装
 
-前往 [Releases](https://github.com/lookmm/ldl_http-socks5/releases/latest) 下载最新 `MarvisProxy-x.y.z-debug.apk`，手机侧载安装（需允许"安装未知来源应用"）。
+前往 [Releases](https://github.com/lookmm/ldl_http-socks5/releases/latest) 下载最新 `LDLProxy-x.y.z-debug.apk`，手机侧载安装（需允许"安装未知来源应用"）。
 
 - 系统要求：Android 7.0 (API 24) 及以上，`arm64-v8a`
 - 仅 28MB 左右，无后台常驻服务、无广告 SDK、无统计上报
@@ -169,7 +169,7 @@ app/src/main/
 - **整体许可为 GPL-3.0**。本项目发布的 APK 打包了 sing-box 的 `libbox`（GPL-3.0-or-later）。按 GPL 的传染性要求，分发包含该库的作品时，整个作品必须以 GPL-3.0 兼容条款分发，并向接收者提供完整对应源码。本仓库即该源码（不含任何节点凭据），构建步骤见上文「从源码构建」。自 `v0.5.11` 起，本项目整体以 GPL-3.0 授权；此前发布的历史版本按其发布时的 MIT 条款继续有效。
 - **源码提供义务已满足**：`app/` 下为全部自研源码，`LICENSE` 为 GPL-3.0 全文；未做任何混淆或闭源封装。唯一不在仓库内的是上游 `libbox-arm64.aar` 预编译产物，可从 [SagerNet/sing-box Releases](https://github.com/SagerNet/sing-box/releases) 获取同版本构建。
 - **版权声明保留**：sing-box 及其规则集版权归原作者（nekohasekai / SagerNet），未做删除或修改；本项目自研部分版权归 lookmm。
-- **名称与关联**：sing-box 的附加条款要求「未经事先同意，衍生作品不得使用其名称或暗示关联」。本项目名称为 **老戴理 / MarvisProxy**，与 SagerNet、MetaCubeX 无隶属、赞助或背书关系；文档中提及 sing-box 仅为事实性依赖说明与致谢，不构成对其名称的商标性使用。
+- **名称与关联**：sing-box 的附加条款要求「未经事先同意，衍生作品不得使用其名称或暗示关联」。本项目名称为 **老戴理 / LDLProxy**，与 SagerNet、MetaCubeX 无隶属、赞助或背书关系；文档中提及 sing-box 仅为事实性依赖说明与致谢，不构成对其名称的商标性使用。
 - **未纳入附加条款代码**：Karing、SFA 等带「GPL-3.0 + 原名禁用」附加条款的项目仅作功能与交互参考，未复制其源码，因此本项目不构成其衍生作品，不受其附加条款约束。
 - **Apache-2.0 组件**：AndroidX、CameraX、zxing 等按其要求保留版权与许可声明，详见 `THIRD_PARTY_NOTICES.md`。
 - **规则集数据**：内置 `geosite-cn` / `geoip-cn` / ads 规则集源自 GPL-3.0 仓库，随本项目以 GPL-3.0 一并分发。

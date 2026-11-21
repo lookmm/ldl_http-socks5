@@ -27,18 +27,37 @@ import javax.net.ssl.SSLSocketFactory
 object ProxyDownloader {
     private const val TAG = "ProxyDownloader"
     private const val MAX_REDIRECT = 4
+    private const val STALL_MS = 15_000L
+    private const val BUDGET_MS = 300_000L
+
+    /** 当前活动 socket，取消时立即关闭，令阻塞 read 立刻抛出。 */
+    @Volatile private var current: Socket? = null
+
+    fun cancel() {
+        runCatching { current?.close() }
+    }
 
     private fun brief(t: Throwable): String = t.javaClass.simpleName + ":" + (t.message ?: "")
 
     /** 下载 url 到 dst，成功后返回 "host · 通道说明"；失败抛异常。 */
-    fun fetchToFile(url: String, node: NodeConfig, dst: File, minBytes: Long, checkSrs: Boolean): String {
-        var current = url
+    fun fetchToFile(
+        url: String,
+        node: NodeConfig,
+        dst: File,
+        minBytes: Long,
+        checkSrs: Boolean,
+        onProgress: ((Long, Long) -> Unit)? = null,
+        total: Long = -1L,
+        isCancelled: () -> Boolean = { false },
+    ): String {
+        var currentUrl = url
         var redirects = 0
         while (true) {
-            val outcome = once(current, node, dst)
+            if (isCancelled()) throw IllegalStateException("已取消")
+            val outcome = once(currentUrl, node, dst, onProgress, total, isCancelled)
             if (outcome.redirect != null) {
                 if (redirects++ >= MAX_REDIRECT) throw IllegalStateException("重定向过多")
-                current = outcome.redirect!!
+                currentUrl = outcome.redirect!!
                 continue
             }
             if (dst.length() < minBytes) {
@@ -62,13 +81,13 @@ object ProxyDownloader {
     fun fetchText(url: String, node: NodeConfig): String {
         val dst = File.createTempFile("pd", ".txt", null)
         try {
-            var current = url
+            var currentUrl = url
             var redirects = 0
             while (true) {
-                val outcome = once(current, node, dst)
+                val outcome = once(currentUrl, node, dst, null, -1L) { false }
                 if (outcome.redirect != null) {
                     if (redirects++ >= MAX_REDIRECT) throw IllegalStateException("重定向过多")
-                    current = outcome.redirect!!
+                    currentUrl = outcome.redirect!!
                     continue
                 }
                 return dst.readText()
@@ -80,7 +99,14 @@ object ProxyDownloader {
 
     private class Outcome(val redirect: String?)
 
-    private fun once(url: String, node: NodeConfig, dst: File): Outcome {
+    private fun once(
+        url: String,
+        node: NodeConfig,
+        dst: File,
+        onProgress: ((Long, Long) -> Unit)?,
+        total: Long,
+        isCancelled: () -> Boolean,
+    ): Outcome {
         val u = java.net.URL(url)
         val https = u.protocol.equals("https", true)
         val host = u.host
@@ -88,12 +114,13 @@ object ProxyDownloader {
         var raw: Socket? = null
         try {
             raw = Socket()
+            current = raw
             raw.connect(InetSocketAddress(node.host, node.port), 6000)
             raw.soTimeout = 15000
 
             val auth = StringBuilder("CONNECT ").append(host).append(':').append(port)
                 .append(" HTTP/1.1\r\nHost: ").append(host).append(':').append(port)
-                .append("\r\nUser-Agent: MarvisProxy/1.0\r\n")
+                .append("\r\nUser-Agent: LDLProxy/1.0\r\n")
             if (node.user.isNotBlank()) {
                 val token = Base64.getEncoder()
                     .encodeToString((node.user + ":" + node.pass).toByteArray())
@@ -122,7 +149,7 @@ object ProxyDownloader {
             } else base
 
             val path = if (u.file.isNullOrEmpty()) "/" else u.file
-            val req = "GET $path HTTP/1.1\r\nHost: $host\r\nUser-Agent: MarvisProxy/1.0\r\n" +
+            val req = "GET $path HTTP/1.1\r\nHost: $host\r\nUser-Agent: LDLProxy/1.0\r\n" +
                 "Accept: */*\r\nAccept-Encoding: identity\r\nConnection: close\r\n\r\n"
             val so = socket.getOutputStream()
             so.write(req.toByteArray())
@@ -137,13 +164,19 @@ object ProxyDownloader {
             }
             if (status != 200) throw IllegalStateException("HTTP $status")
 
+            val declared = headerOf(respHead, "content-length")?.trim()?.toLongOrNull()
+            if (total > 0 && declared != null && declared != total) {
+                throw IllegalStateException("源大小异常(${declared}B)")
+            }
+            val expect = if (declared != null && declared > 0) declared else total
             dst.parentFile?.mkdirs()
             dst.outputStream().use { fo ->
                 if ((headerOf(respHead, "transfer-encoding") ?: "").contains("chunked", true)) {
-                    copyChunked(din, fo)
+                    copyChunked(din, fo, expect, onProgress, isCancelled)
+                } else if (declared != null) {
+                    copyN(din, fo, declared, expect, onProgress, isCancelled)
                 } else {
-                    val len = headerOf(respHead, "content-length")?.trim()?.toLongOrNull()
-                    if (len != null) copyN(din, fo, len) else din.copyTo(fo, 16 * 1024)
+                    copyAll(din, fo, expect, onProgress, isCancelled)
                 }
             }
             return Outcome(null)
@@ -152,6 +185,7 @@ object ProxyDownloader {
             dst.delete()
             throw t
         } finally {
+            current = null
             try {
                 raw?.close()
             } catch (_: Throwable) {
@@ -207,32 +241,118 @@ object ProxyDownloader {
         return null
     }
 
-    private fun copyN(input: InputStream, out: java.io.OutputStream, len: Long) {
+    private fun copyN(
+        input: InputStream,
+        out: java.io.OutputStream,
+        len: Long,
+        total: Long,
+        onProgress: ((Long, Long) -> Unit)?,
+        isCancelled: () -> Boolean,
+    ) {
         var left = len
         val buf = ByteArray(32 * 1024)
+        var lastBump = System.currentTimeMillis()
+        var lastReport = 0L
+        val start = lastBump
         while (left > 0) {
-            val n = input.read(buf, 0, minOf(buf.size.toLong(), left).toInt())
+            if (isCancelled()) throw IllegalStateException("已取消")
+            val n = try {
+                input.read(buf, 0, minOf(buf.size.toLong(), left).toInt())
+            } catch (e: java.net.SocketTimeoutException) {
+                throw IllegalStateException("下载停滞（剩 ${left / 1024}KB）")
+            }
             if (n <= 0) throw IllegalStateException("连接被提前关闭(剩 $left)")
             out.write(buf, 0, n)
             left -= n
+            val now = System.currentTimeMillis()
+            if (now - lastBump > STALL_MS) throw IllegalStateException("下载停滞（剩 ${left / 1024}KB）")
+            lastBump = now
+            if (now - start > BUDGET_MS) throw IllegalStateException("下载超时")
+            if (onProgress != null && now - lastReport > 200) {
+                lastReport = now
+                onProgress(len - left, total)
+            }
         }
+        onProgress?.invoke(len, total)
     }
 
-    private fun copyChunked(input: InputStream, out: java.io.OutputStream) {
+    private fun copyAll(
+        input: InputStream,
+        out: java.io.OutputStream,
+        total: Long,
+        onProgress: ((Long, Long) -> Unit)?,
+        isCancelled: () -> Boolean,
+    ) {
         val buf = ByteArray(32 * 1024)
+        var done = 0L
+        var lastBump = System.currentTimeMillis()
+        var lastReport = 0L
+        val start = lastBump
         while (true) {
+            if (isCancelled()) throw IllegalStateException("已取消")
+            val n = try {
+                input.read(buf)
+            } catch (e: java.net.SocketTimeoutException) {
+                throw IllegalStateException("下载停滞（${done / 1024}KB 后超时）")
+            }
+            if (n < 0) break
+            if (n > 0) {
+                out.write(buf, 0, n)
+                done += n
+                lastBump = System.currentTimeMillis()
+            }
+            val now = System.currentTimeMillis()
+            if (now - lastBump > STALL_MS) throw IllegalStateException("下载停滞（${done / 1024}KB 后无数据）")
+            if (now - start > BUDGET_MS) throw IllegalStateException("下载超时（${done / 1024}KB）")
+            if (onProgress != null && now - lastReport > 200) {
+                lastReport = now
+                onProgress(done, total)
+            }
+        }
+        onProgress?.invoke(done, total)
+    }
+
+    private fun copyChunked(
+        input: InputStream,
+        out: java.io.OutputStream,
+        total: Long,
+        onProgress: ((Long, Long) -> Unit)?,
+        isCancelled: () -> Boolean,
+    ) {
+        val buf = ByteArray(32 * 1024)
+        var done = 0L
+        var lastBump = System.currentTimeMillis()
+        var lastReport = 0L
+        val start = lastBump
+        while (true) {
+            if (isCancelled()) throw IllegalStateException("已取消")
             val line = readAsciiLine(input) ?: throw IllegalStateException("chunk 结束异常")
             val size = line.trim().split(' ')[0].toIntOrNull(16) ?: throw IllegalStateException("chunk 头异常")
-            if (size == 0) return
+            if (size == 0) break
             var left = size
             while (left > 0) {
-                val n = input.read(buf, 0, minOf(buf.size, left))
+                if (isCancelled()) throw IllegalStateException("已取消")
+                val n = try {
+                    input.read(buf, 0, minOf(buf.size, left))
+                } catch (e: java.net.SocketTimeoutException) {
+                    throw IllegalStateException("下载停滞（${done / 1024}KB 后超时）")
+                }
                 if (n <= 0) throw IllegalStateException("chunk 数据不全")
                 out.write(buf, 0, n)
                 left -= n
+                done += n
+                val now = System.currentTimeMillis()
+                if (now - lastBump > STALL_MS) throw IllegalStateException("下载停滞（${done / 1024}KB 后无数据）")
+                lastBump = now
+                if (now - start > BUDGET_MS) throw IllegalStateException("下载超时")
+                if (onProgress != null && now - lastReport > 200) {
+                    lastReport = now
+                    onProgress(done, total)
+                }
             }
             readAsciiLine(input)
         }
+        onProgress?.invoke(done, total)
     }
 
     private fun readAsciiLine(input: InputStream): String? {

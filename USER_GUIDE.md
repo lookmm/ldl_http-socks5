@@ -32,7 +32,7 @@
 | 系统 | Android 7.0（API 24）及以上 |
 | 架构 | arm64-v8a（现主流手机均满足） |
 | 体积 | 约 28MB |
-| 来源 | [Releases](https://github.com/lookmm/ldl_http-socks5/releases/latest) 中的 `MarvisProxy-x.y.z-debug.apk` |
+| 来源 | [Releases](https://github.com/lookmm/ldl_http-socks5/releases/latest) 中的 `LDLProxy-x.y.z-debug.apk` |
 
 安装步骤：
 

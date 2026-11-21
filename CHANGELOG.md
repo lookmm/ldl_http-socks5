@@ -2,6 +2,22 @@
 
 本项目版本号与更新通道元数据以仓库根目录 `version.json` 为准，APK 附件见 [Releases](https://github.com/lookmm/ldl_http-socks5/releases)。
 
+## v0.5.14 — 2026-11-21
+
+### 变更
+
+| 项 | 说明 |
+| --- | --- |
+| 项目代号统一 | 工程名、日志 TAG、VPN 会话名与请求 User-Agent 统一为 `LDLProxy`，不再包含旧代号 |
+| 发布件命名 | APK 附件更名为 `LDLProxy-x.y.z-debug.apk`，历史版本附件同步更名，下载地址随之更新 |
+| 首页示例图 | README 示例图替换为新版首页「已连接」界面 |
+
+### 升级说明
+
+- 忽略网段与忽略域名改用新的存储命名空间（`ldl_proxy`），升级后需重新设置自定义条目；节点配置与授权状态不受影响
+- 已安装旧版本：App 内点「检查更新」即可升级
+- 首次安装：前往 Releases 下载 `LDLProxy-0.5.14-debug.apk`
+
 ## v0.5.12 — 2026-11-21
 
 ### 新增 / 修复
@@ -23,7 +39,7 @@
 ### 升级方式
 
 - 已安装旧版本：App 内点「检查更新」，或在设置里下载后直接安装（自动升级通道已内置，无需 adb）
-- 首次安装：前往 Releases 下载 `MarvisProxy-0.5.12-debug.apk`
+- 首次安装：前往 Releases 下载 `LDLProxy-0.5.12-debug.apk`
 - 配置兼容：忽略列表与节点配置仍在原 prefs 中，升级不丢失
 
 ## v0.5.11 — 2026-11-20

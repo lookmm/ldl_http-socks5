@@ -37,7 +37,7 @@ class ProxyVpnService : VpnService() {
         private set
 
     companion object {
-        private const val TAG = "MarvisProxy"
+        private const val TAG = "LDLProxy"
         const val ACTION_START = "com.liuyunli.proxy.START"
         const val ACTION_STOP = "com.liuyunli.proxy.STOP"
 
@@ -344,7 +344,7 @@ class ProxyVpnService : VpnService() {
 
     fun establishTun(options: TunOptions): Int {
         val builder = Builder()
-        builder.setSession("MarvisProxy")
+        builder.setSession("LDLProxy")
         // TUN 的 MTU 必须小于物理网卡 MTU（wlan0 通常 1500），
         // 否则 TLS 握手等大包会被分包/丢弃，表现"小包(mDNS/ping)能过、HTTPS 全挂"
         val mtu = if (options.mtu > 1400) 1400 else options.mtu
