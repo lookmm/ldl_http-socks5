@@ -1,10 +1,10 @@
 {
-  "versionCode": 16,
-  "versionName": "0.5.12",
-  "url": "https://github.com/lookmm/ldl_http-socks5/releases/download/v0.5.12/MarvisProxy-0.5.12-debug.apk",
-  "md5": "259e6baa5e26771903d9e005e7fc7ae4",
-  "size": 28745373,
-  "notes": "0.5.12 更新内容\n- 忽略网段支持单个 IP：填 192.168.1.5 自动按 /32 处理，不必手写掩码\n- 忽略域名支持通配符：*.example.com 仅匹配子域；填 example.com 则为该域及全部子域\n- 内置 localhost 直连：本地开发 / 调试服务不再被代理\n- 连接页：节点名为空时以 host:port 兜底展示，不再出现「当前节点：（HTTP）」空括号\n- 连接页：连接失败提示改为卡片式（标题 + 详情展开），替代原先的长段红字\n- 输入提示同步：IP 或网段 / *.example.com / localhost\n- 升级无需 adb：App 内「检查更新」即可走自动升级通道",
+  "versionCode": 17,
+  "versionName": "0.5.13",
+  "url": "https://github.com/lookmm/ldl_http-socks5/releases/download/v0.5.13/MarvisProxy-0.5.13-debug.apk",
+  "md5": "402c999e8c2e0efc86c4bfd484639df7",
+  "size": 28755761,
+  "notes": "0.5.13 更新内容\n- 下载进度可视化：显示 已下载/总大小、百分比与实时速度，不再出现「点了没反应」的假死观感\n- 下载可取消：点「取消」立即断开连接并终止，无需再强杀进程\n- 卡死自愈：单个源 15 秒无新增字节即判停滞并自动换下一个源，单源最长 5 分钟\n- 完整性校验：下载后按 version.json 的 size 与 md5 双重校验，坏包不会误装\n- 镜像顺序调整：国内反代（ghfast / gh-proxy）优先，GitHub 直链最后兜底\n",
   "minSdk": 26,
-  "publishedAt": "2026-11-21T03:06:05Z"
+  "publishedAt": "2026-11-21T03:36:26Z"
 }
