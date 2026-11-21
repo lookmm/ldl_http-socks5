@@ -80,3 +80,10 @@
 - [x] Apache-2.0 组件保留版权与许可声明
 - [x] CC-BY 素材完成署名与许可证标注
 - [x] 仓库内不含任何真实节点地址、账号与密码
+
+## 上游版本对应关系（GPL 对应源码说明）
+
+- `libbox-arm64.aar` 不随本仓库分发。APK 中打包的这一二进制取自 [SagerNet/sing-box](https://github.com/SagerNet/sing-box) 的官方发布产物。
+- 对应源码入口：[sing-box Releases](https://github.com/SagerNet/sing-box/releases)。按构建时所用 tag 取同版本完整源码，即为该二进制对应的源码。
+- 自行核验 APK 内实际内核版本：解包 APK，取 `lib/arm64-v8a/libbox.so`，执行 `strings libbox.so | grep -i -m1 "sing-box"`，输出中的版本号即打包版本，据此在上面的 Releases 中定位同 tag 源码。
+- 构建者义务：每次发版记录所用 sing-box tag，保证「分发的二进制」与「提供的源码」一一对应，落实 GPL-3.0 关于对应源码（Corresponding Source）的提供义务。
